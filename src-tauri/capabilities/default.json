@@ -1,0 +1,25 @@
+{
+    "$schema": "../gen/schemas/desktop-schema.json",
+    "identifier": "default",
+    "description": "Capability for the main window",
+    "windows": [
+        "main"
+    ],
+    "permissions": [
+        "core:default",
+        "opener:default",
+        "fs:read-all",
+        "fs:write-all",
+        "fs:allow-app-write-recursive",
+        "fs:allow-app-read-recursive",
+        "dialog:allow-message",
+        "dialog:default",
+        "sql:allow-load",
+        "sql:default",
+        "sql:allow-execute",
+        "store:default",
+        "store:allow-load",
+        "store:allow-save",
+        "store:allow-set"
+    ]
+}
