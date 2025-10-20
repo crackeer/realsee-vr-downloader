@@ -5,7 +5,7 @@ import { message, open } from "@tauri-apps/plugin-dialog";
 import "jsoneditor/dist/jsoneditor.css";
 import JSONEditor from "@/component/JSONEditor";
 import { path } from "@tauri-apps/api";
-import invoke from "@/util/invoke";
+import {readFile, writeFile, downloadFile, downloadFileWithContent, deleteFile, openFile, fileExists} from "@/util/invoke";
 import {
     Space,
     Button,
@@ -75,7 +75,7 @@ export default function Download({
         });
         if (file == null) return;
         try {
-            let result = await invoke.readFile(file);
+            let result = await readFile(file);
             let json = JSON.parse(result);
             editor.set(json);
             setCubeSize(json);
@@ -176,7 +176,7 @@ export default function Download({
         await downloadResource(totalData, baseURL, downloadDir);
         console.log("downloadResourceEnd", downloadDir);
         let workJsonSave = await path.join(downloadDir, "work.json");
-        await invoke.writeFile(workJsonSave, JSON.stringify(newWorkJson));
+        await writeFile(workJsonSave, JSON.stringify(newWorkJson));
         setDownloadList([]);
         setDownloadStatus("success");
     };
@@ -319,29 +319,25 @@ export default function Download({
             let dest = await path.join(saveDir, list[i]);
             setCurrent(list[i]);
             setFileCount(list.length - i - 1);
+            console.log(fullURL, dest)
             await doDownload(fullURL, dest);
         }
     };
 
     const doDownloadJson = async (url, dest) => {
         try {
-            let result = await invoke.fileExists(dest);
-            if (result.success && result.data.exists) {
-                let data = await invoke.readFile(dest);
-                if (data.success) {
-                    return data.data;
-                }
+            let result = await fileExists(dest);
+            if (result.exists === true) {
+                return await readFile(dest);
             }
         } catch (e) {
             console.log(e);
             return false;
         }
         try {
-            let result = await invoke.httpDownloadFileV2(url, dest);
-            if (!result.success) {
-                return false;
-            }
-            return result.data;
+            let result = await downloadFileWithContent(url, dest);
+            console.log("downloadFileWithContent", dest, result);
+            return result
         } catch (e) {
             console.log(e);
             return false;
@@ -349,8 +345,8 @@ export default function Download({
     };
     const doDownload = async (url, dest) => {
         try {
-            let result = await invoke.fileExists(dest);
-            if (result.success && result.data.exists) {
+            let result = await fileExists(dest);
+            if (result.exists === true) {
                 return true;
             }
         } catch (e) {
@@ -358,14 +354,10 @@ export default function Download({
             return false;
         }
         try {
-            let result = await invoke.httpDownloadFile(url, dest);
-            if (result.success) {
-                return true;
-            }
-            await invoke.deleteFile(dest);
-            return false;
+            let result = await downloadFile(url, dest);
+            return true
         } catch (e) {
-            console.log(e);
+            await deleteFile(dest);
             return false;
         }
     };

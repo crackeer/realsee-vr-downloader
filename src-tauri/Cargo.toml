@@ -36,7 +36,7 @@ bytes = "1.0"
 tar = "0.4"
 flate2 = "1.0"
 scraper = "0.12.0"
-rust_box = { path = "../../rust_box" }
 tauri-plugin-store = "2"
 store = "0.1.0-alpha.3"
 toml = "0.5.10"
+open = "5"

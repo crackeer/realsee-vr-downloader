@@ -30,7 +30,6 @@ export default function VRPage() {
                 <TabPane title="VR转换" key="convert">
                     <Convert />
                 </TabPane>
-               
             </Tabs>
         </div>
     );

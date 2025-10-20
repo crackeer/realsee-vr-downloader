@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { message, open } from "@tauri-apps/plugin-dialog";
 import "jsoneditor/dist/jsoneditor.css";
 import { path } from "@tauri-apps/api";
-import invoke from "@/util/invoke";
+import {readFile} from "@/util/invoke";
 import {
     Space,
     Button,
