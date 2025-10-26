@@ -2,7 +2,7 @@ mod command;
 use tauri::{Window};
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 
-use command::{read_file, write_file, file_exists, download_file, download_file_with_content, delete_file, open_file};
+use command::{read_file, write_file, file_exists, download_file, download_file_with_content, delete_file, open_path};
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
@@ -17,7 +17,7 @@ pub fn run() {
            delete_file,
            file_exists,
            download_file,
-           open_file,
+           open_path,
            download_file_with_content,
         ])
         .run(tauri::generate_context!())

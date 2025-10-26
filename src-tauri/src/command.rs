@@ -86,6 +86,6 @@ pub async fn download_file_with_content(url: String, save_path: String) -> Resul
 }
 
 #[tauri::command]
-pub async fn open_file(file_path: String) -> Result<(), String> {
+pub async fn open_path(file_path: String) -> Result<(), String> {
     open::that(&file_path).map_err(|e| e.to_string())
 }

@@ -29,7 +29,6 @@ export async function fileExists(filePath) {
     let result = await invoke("file_exists", {
         filePath: filePath,
     });
-    console.log("fileExists", filePath, result);
     return result;
 };
 
@@ -81,4 +80,10 @@ export async function openFile(filePath) {
 
 export async function isDev() {
     return true
+}
+
+export async function openPath(path) {
+     return await invoke("open_path", {
+        filePath : path,
+    });
 }

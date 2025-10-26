@@ -5,7 +5,7 @@ import { message, open } from "@tauri-apps/plugin-dialog";
 import "jsoneditor/dist/jsoneditor.css";
 import JSONEditor from "@/component/JSONEditor";
 import { path } from "@tauri-apps/api";
-import {readFile, writeFile, downloadFile, downloadFileWithContent, deleteFile, openFile, fileExists} from "@/util/invoke";
+import {readFile, writeFile, downloadFile, downloadFileWithContent, deleteFile, openPath, fileExists} from "@/util/invoke";
 import {
     Space,
     Button,
@@ -19,7 +19,7 @@ import {
     Radio,
 } from "@arco-design/web-react";
 import common from "@/util/common";
-import lodash from "lodash";
+import lodash, { set } from "lodash";
 import { getPageDataJson, updatePageDataJson } from "@/store/page";
 
 const Row = Grid.Row;
@@ -173,7 +173,10 @@ export default function Download({
         setDownloadList(totalData);
 
         setDownloadStatus("downloading");
-        await downloadResource(totalData, baseURL, downloadDir);
+        let result = await downloadResource(totalData, baseURL, downloadDir);
+        if (result === false) {
+            return;
+        }
         console.log("downloadResourceEnd", downloadDir);
         let workJsonSave = await path.join(downloadDir, "work.json");
         await writeFile(workJsonSave, JSON.stringify(newWorkJson));
@@ -350,7 +353,6 @@ export default function Download({
                 return true;
             }
         } catch (e) {
-            console.log(e);
             return false;
         }
         try {
@@ -430,14 +432,14 @@ export default function Download({
         if (dir == null || dir == "") {
             return;
         }
-        await invoke.openPath(dir);
+        await openPath(dir);
     };
 
     return (
         <>
             <div style={{ marginBottom: "10px" }}>
                 <Form form={form} labelCol={{ span: 4 }}>
-                    <Form.Item field="json" label="work.json">
+                    <Form.Item field="json" label="work数据">
                         <Row gutter={10}>
                             <Col span={21}>
                                 <JSONEditor
@@ -446,6 +448,7 @@ export default function Download({
                                     json={{}}
                                     onValidate={onJsonValidate}
                                 />
+                                <div>点位数量：{observerCount}</div>
                             </Col>
                             <Col span={3}>
                                 <Button type="primary" onClick={loadJSON}>
@@ -454,18 +457,15 @@ export default function Download({
                             </Col>
                         </Row>
                     </Form.Item>
-                    <Form.Item label="点位数量">
-                        <div>{observerCount}</div>
-                    </Form.Item>
                     <Form.Item
-                        label="Cube尺寸"
+                        label="图像尺寸"
                         field="cube_size"
                         rules={[{ required: true, message: "请选择Cube大小" }]}
                     >
                         <CheckboxGroup options={CubeSizes} />
                     </Form.Item>
                     <Form.Item
-                        label="模型layers下载"
+                        label="点云下载"
                         field="download_layers"
                         rules={[
                             { required: true, message: "请选择模型layers下载" },
@@ -548,7 +548,7 @@ export default function Download({
                 </Card>
             ) : null}
 
-            {downloadStatus == "downloading" ? (
+            {downloadStatus == "downloading"  ? (
                 <Card>
                     <Statistic
                         title="剩余下载项"
